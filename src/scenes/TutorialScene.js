@@ -50,6 +50,7 @@ class TutorialScene extends Phaser.Scene {
         };
 
         this.input.keyboard.on('keydown-SPACE', () => {
+            this.sound.play('select', { volume: 0.15 });
             if (isTyping) {
                 // If typing then skip to end
                 skipTyping();
@@ -69,6 +70,7 @@ class TutorialScene extends Phaser.Scene {
         // If all text is displayed, set up event: SPACE to switch to PlayScene
         this.input.keyboard.removeAllListeners('keydown-SPACE');
         this.input.keyboard.on('keydown-SPACE', () => {
+            this.sound.play('select', { volume: 0.15 });
             this.input.keyboard.removeAllListeners('keydown-SPACE');
             this.scene.start('PlayScene');
         });

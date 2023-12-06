@@ -10,6 +10,7 @@ class TitleScene extends Phaser.Scene {
         this.load.audio('bgm', 'assets/MrSmithAction.wav');
         this.load.audio('shoot', 'assets/shoot.wav');
         this.load.audio('explosion', 'assets/explosion.wav');
+        this.load.audio('lose', 'assets/lose.mp3');
     }
 
     create() {
@@ -22,6 +23,7 @@ class TitleScene extends Phaser.Scene {
         spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 
         this.input.keyboard.on('keydown-SPACE', () => {
+            this.sound.play('select', { volume: 0.15 });
             titleScreen.setVisible(false);
             startText.setVisible(false);
             this.scene.start('TutorialScene');

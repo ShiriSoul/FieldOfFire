@@ -106,32 +106,6 @@ class PlayScene extends Phaser.Scene {
                 this.startGrenadeCooldown();
             }
         });
-
-        // Add a 10-minute countdown timer in the top center
-        const timerTextStyle = { fontSize: '24px', fill: '#fff' };
-        this.timerText = this.add.text(
-            this.cameras.main.width / 2,
-            16,
-            '10:00',
-            timerTextStyle
-        )
-        .setOrigin(0.5, 0)
-        .setScrollFactor(0)
-        .setBackgroundColor('#000')
-        .setAlpha(0.7);
-
-        // Sets countdown duration to 10 minutes (600 sec)
-        const countdownDuration = 600000;
-
-        // Starts the countdown timer
-        this.countdownTimer = this.time.addEvent({
-            delay: 1000, // Update every 1 second
-            callback: this.updateCountdownTimer,
-            callbackScope: this,
-            loop: true,
-            startAt: 0,
-            duration: countdownDuration,
-        });
     }
 
     update() {
@@ -336,6 +310,8 @@ class PlayScene extends Phaser.Scene {
     showCollisionPopup() {
         this.sound.stopAll(); // Ends audio
 
+        this.sound.play('lose', { volume: 0.15 });
+
         // Stops auto shooting
         if (this.shootTimer) {
             this.shootTimer.destroy();
@@ -456,20 +432,4 @@ class PlayScene extends Phaser.Scene {
         this.lastGrenadeTime = this.time.now; // Updates the last grenade time
     }
 
-    // Countdown Timer Update
-    updateCountdownTimer() {
-        const elapsedSeconds = Math.floor(this.countdownTimer.getElapsedSeconds());
-        const remainingSeconds = Math.max(0, 600 - elapsedSeconds);
-        const minutes = Math.floor(remainingSeconds / 60);
-        const seconds = remainingSeconds % 60;
-    
-        // Updates the timer display
-        this.timerText.setText(`${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`);
-    
-        // Checks if timer reached 0
-        if (remainingSeconds === 0) {
-            // Displays game over popup
-            this.showCollisionPopup();
-        }
-    }
 }
