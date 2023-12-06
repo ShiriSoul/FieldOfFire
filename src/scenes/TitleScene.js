@@ -5,6 +5,12 @@ class TitleScene extends Phaser.Scene {
 
     preload() {
         this.load.image('titlescreen', 'assets/titlescreen.png');
+        this.load.audio('select', 'assets/select.wav');
+        this.load.audio('death', 'assets/death.mp3');
+        this.load.audio('bgm', 'assets/MrSmithAction.wav');
+        this.load.audio('shoot', 'assets/shoot.wav');
+        this.load.audio('explosion', 'assets/explosion.wav');
+        // update instruction text
     }
 
     create() {
@@ -20,5 +26,6 @@ class TitleScene extends Phaser.Scene {
             startText.setVisible(false);
             this.scene.start('TutorialScene');
         });
+        document.getElementById('info').innerHTML = 'W,A,S,D: move | G: grenade (20 second cooldown) | M: mute audio'
     }
 }
