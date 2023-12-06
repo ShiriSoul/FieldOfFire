@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Field of Fire</title>
+    <script src="lib/phaser.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+<script src="src/prefabs/Player.js"></script>
+<script src="src/prefabs/Projectile.js"></script>
+<script src="src/prefabs/Enemy.js"></script>
+<script src="src/scenes/TitleScene.js"></script>
+<script src="src/scenes/TutorialScene.js"></script>
+<script src="src/scenes/PlayScene.js"></script>
+<script src="src/main.js"></script>
+
+<script>
+    // Load game configuration from main.js
+    const config = gameConfig;
+    let game = new Phaser.Game(config);
+</script>
+
+</body>
+</html>
