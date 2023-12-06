@@ -15,6 +15,8 @@
 /* This pop up part was also quite difficult as I struggled to "pause" the game/scene while having the restart button still usable as pausing scene paused everything.
 /* A simple fix though as instead of pausing functions, I decided to delete them as the pop up point was the game over point so restarting or refreshing would be the only options anyways.
 /* 
+/* To DO: Add Enemy Shooting (couldn't get this done within the available time as it kept brining up errors. I tried but ultiamtely made enemies melee until I can get shooting to work)
+/*
 /* Sources/Credits:
 /* https://newdocs.phaser.io/docs/3.60.0/Phaser.Animations.Animation            Helped with figuring out anims for grenade explosion as I had to use a new spritesheet maker and the json might've been different
 /* https://newdocs.phaser.io/docs/3.60.0/Phaser.Animations.AnimationFrame

@@ -4,7 +4,7 @@ class PlayScene extends Phaser.Scene {
         this.shootTimer = null;
         this.lastPlayerDirection = 'UP';
         this.grenadeCooldown = false;
-        this.grenadeCooldownTime = 10000; // 10 seconds (adjust as needed)
+        this.grenadeCooldownTime = 10000; // 10 seconds. Adjust as needed
         this.lastGrenadeTime = 0;
     }
 
@@ -17,18 +17,16 @@ class PlayScene extends Phaser.Scene {
     }
 
     create() {
-        // Add the background image
-        const background = this.add.sprite(1600, 1200, 'background'); // Adjust the position as needed
+        // Add background image
+        const background = this.add.sprite(1600, 1200, 'background'); // Adjust position as needed
 
-        // Instantiate player, projectiles, enemies
         this.player = new Player(this, 1600, 1200);
         this.projectiles = this.physics.add.group({ classType: Projectile });
         this.enemies = this.physics.add.group({ classType: Enemy });
     
-        // Add play scene code here
         this.physics.add.collider(this.projectiles, this.enemies, this.projectileHitEnemy, null, this);
     
-        // Define keys
+        // Define keys (W,A,S,D for movement and G for grenade)
         cursors = this.input.keyboard.addKeys({
             W: Phaser.Input.Keyboard.KeyCodes.W,
             A: Phaser.Input.Keyboard.KeyCodes.A,
@@ -39,62 +37,62 @@ class PlayScene extends Phaser.Scene {
     
         spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
     
-        // Spawn enemies periodically
+        // Spawn enemies every few seconds (I actually think its every second exactly)
         this.time.addEvent({
-            delay: 1000, // 1000 milliseconds (1 second)
+            delay: 1000, // 1 sec
             callback: this.spawnEnemy,
             callbackScope: this,
             loop: true
         });
 
         this.shootTimer = this.time.addEvent({
-            delay: 1500, // 2000 milliseconds (1.5 seconds)
+            delay: 1500, // 1.5 sec
             callback: this.shootProjectile,
             callbackScope: this,
-            loop: true, // Repeat indefinitely
+            loop: true, // Repeat forever
         });
 
-        // Initialize score variable
+        // Initialize kill score variable
         this.score = 0;
 
         // Add score display at the top right
         const scoreTextStyle = { fontSize: '24px', fill: '#fff' };
         this.scoreText = this.add.text(
-            this.cameras.main.width - 16, // X-coordinate (right edge of the screen)
-            16,                             // Y-coordinate
-            'Score: 0',
+            this.cameras.main.width - 16, // X-coordinate
+            16,                           // Y-coordinate
+            'Kills: 0',
             scoreTextStyle
         )
-        .setOrigin(1, 0)                    // Set origin to the top right
+        .setOrigin(1, 0)                  // Sets origin to top right
         .setScrollFactor(0)
         .setBackgroundColor('#000')
         .setAlpha(0.7);
 
-        // Set the world bounds to the larger map size
+        // Sets world bounds to be 4x as larger map size than the 800x600 camera size
         this.physics.world.setBounds(0, 0, 3200, 2400);
 
-        // Set the camera to follow the player
+        // Sets main camera to follow player
         this.cameras.main.startFollow(this.player);
         this.cameras.main.setBounds(0, 0, 3200, 2400);
 
-        // Play background music
+        // bgm
         const bgm = this.sound.add('bgm', { loop: true, volume: 0.10 });
         bgm.play();
 
+        // Press M key to mute all audio. I added this incase play testing and didn't want to blast audio in class.
         this.input.keyboard.on('keydown-M', () => {
-            // Toggle global audio mute state
             this.sound.mute = !this.sound.mute;
     
-            // Log the current audio mute state (optional)
-            console.log('Audio Mute State:', this.sound.mute);
+            // This tells us in console on if M has successfully muted audio or not. It is used to debug.
+            // console.log('Audio Mute State:', this.sound.mute);
         });
 
-        // Add countdown display at the top left
+        // Adds grenade countdown display at the top left
         const countdownTextStyle = { fontSize: '24px', fill: '#fff' };
         this.countdownText = this.add.text(
-            16, // X-coordinate (left edge of the screen)
+            16, // X-coordinate
             16, // Y-coordinate
-            'Ready',
+            'Ready', // Ready means the cooldown is complete and skill is ready to use
             countdownTextStyle
         )
         .setOrigin(0, 0)
@@ -111,7 +109,7 @@ class PlayScene extends Phaser.Scene {
     }
 
     update() {
-        // Player movement and shooting logic
+        // Player movement
         this.player.setVelocity(0);
     
         if (this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W).isDown) {
@@ -130,7 +128,7 @@ class PlayScene extends Phaser.Scene {
             this.lastPlayerDirection = 'RIGHT';
         }
 
-        // Diagonal movement
+        // Diagonal player movement
         if (cursors.W.isDown && cursors.A.isDown) {
             this.player.setVelocity(-150, -150);
             this.lastPlayerDirection = 'UP_LEFT';
@@ -145,7 +143,7 @@ class PlayScene extends Phaser.Scene {
             this.lastPlayerDirection = 'DOWN_RIGHT';
         }
 
-        // Update player rotation based on the last movement direction
+        // Update player rotation based on last movement direction. (Instead of spritesheet the player is just a png so we use the direction inputs to rotate the png)
         switch (this.lastPlayerDirection) {
             case 'UP':
                 this.player.setRotation(Phaser.Math.DegToRad(0));
@@ -173,11 +171,11 @@ class PlayScene extends Phaser.Scene {
                 break;
         }
 
-        // Move enemies towards the player
+        // Moves enemies towards the player
         this.enemies.getChildren().forEach(enemy => {
             const angle = Phaser.Math.Angle.Between(enemy.x, enemy.y, this.player.x, this.player.y);
-            const playerSpeed = 125; // Adjust the player's speed as needed
-            const enemySpeedPercentage = 0.4; // Adjust the percentage as needed
+            const playerSpeed = 125; // Adjust player's speed
+            const enemySpeedPercentage = 0.4; // Adjust percentage
             const speed = playerSpeed * enemySpeedPercentage;
 
             enemy.setVelocityX(Math.cos(angle) * speed);
@@ -197,20 +195,19 @@ class PlayScene extends Phaser.Scene {
 
             // Check for collisions between enemies and projectiles
             this.physics.world.collide(enemy, this.projectiles, (enemy, projectile) => {
-                // Handle collision logic (destroy enemy, projectile, update score, etc.)
                 this.projectileHitEnemy(projectile, enemy);
             });
         });
 
-        // Update the countdown display
+        // Updates the countdown display
         this.updateCountdownDisplay();
     }
     
 
     shootProjectile() {
         if (this.player.active) {
-            const spacing = 15; // Adjust this value to set the spacing between projectiles
-            const lifespan = 2500; // Lifespan in milliseconds (2.5 seconds)
+            const spacing = 15; // Value to set the spacing between projectiles
+            const lifespan = 2500; // Bullet lifespan in milliseconds (2.5 sec)
     
             for (let i = 0; i < 3; i++) {
                 const projectile = this.projectiles.get(this.player.x, this.player.y, 'projectile');
@@ -257,10 +254,10 @@ class PlayScene extends Phaser.Scene {
 
                 projectile.setScale(.25);
 
-                // Play the shooting sound effect
+                // Play the shooting sfx
                 this.sound.play('shoot', { volume: 0.15 });
 
-                // Set a timer to destroy the projectile after the specified lifespan
+                // Sets timer to destroy projectiles after the specified lifespan (2.5 sec)
                 this.time.delayedCall(lifespan, () => {
                     projectile.destroy();
                 });
@@ -268,9 +265,9 @@ class PlayScene extends Phaser.Scene {
         }
     }
     
-
+    // Will spawn enemies at random places on the border of the camera so enemies always spawn near player
     spawnEnemy() {
-        const side = Phaser.Math.Between(0, 3); // 0: top, 1: right, 2: bottom, 3: left
+        const side = Phaser.Math.Between(0, 3);
         let x, y;
     
         switch (side) {
@@ -296,27 +293,29 @@ class PlayScene extends Phaser.Scene {
         enemy.setVelocity(0, 100);
     }
 
+    // Kill count
     projectileHitEnemy(projectile, enemy) {
         projectile.destroy();
         enemy.destroy();
         this.sound.play('death', { volume: 0.15 })
     
-        // Increase the score
+        // Increases score
         this.score += 1;
     
         // Update the score display
-        this.scoreText.setText(`Score: ${this.score}`);
+        this.scoreText.setText(`Kill: ${this.score}`);
     }    
 
+    // Game Over Pop Up
     showCollisionPopup() {
-        this.sound.stopAll();
+        this.sound.stopAll(); // Ends audio
 
-        // Stop shooting
+        // Stops auto shooting
         if (this.shootTimer) {
             this.shootTimer.destroy();
         }
 
-        // Destroy all existing enemies
+        // Destroy all existing enemies (I think enemies still spawn and I couldn't work past it but the score won't be added to it and enemies get destroyed on contact)
         this.enemies.getChildren().forEach(enemy => {
             enemy.destroy();
         });
@@ -326,13 +325,13 @@ class PlayScene extends Phaser.Scene {
             .setOrigin(0.5)
             .setScrollFactor(0);
     
-        // Create and show a popup with the score
+        // Create a popup and display the score
         const popupTextStyle = { fontSize: '32px', fill: '#fff', padding: 10 };
-        const popupText = this.add.text(this.cameras.main.width / 2, this.cameras.main.height / 2 - 40, `Game Over!\nScore: ${this.score}`, popupTextStyle)
+        const popupText = this.add.text(this.cameras.main.width / 2, this.cameras.main.height / 2 - 40, `Game Over!\nKills: ${this.score}`, popupTextStyle)
             .setOrigin(0.5)
             .setScrollFactor(0);
     
-        // Add a button to restart the game
+        // Adds a restart the game button
         const buttonStyle = { fontSize: '24px', fill: '#fff', backgroundColor: '#008CBA', padding: 10 };
         const restartButton = this.add.text(this.cameras.main.width / 2, this.cameras.main.height / 2 + 60, 'Click Here To Restart', buttonStyle)
             .setOrigin(0.5)
@@ -343,7 +342,7 @@ class PlayScene extends Phaser.Scene {
             // Play the "select" sound effect
             this.sound.play('select', { volume: 0.15 });
             
-            // Restart the game
+            // Restarts the game
             this.gameOver = false;
             this.scene.restart();
         });
@@ -352,29 +351,19 @@ class PlayScene extends Phaser.Scene {
     placeGrenade() {
         const grenade = this.physics.add.sprite(this.player.x, this.player.y, 'grenade');
     
-        // Set a timer to destroy the grenade after 3 seconds
+        // Sets a timer to destroy the grenade after 3 seconds (grenade cooking time before BOOM)
         this.time.delayedCall(3000, () => {
             grenade.destroy();
             this.explodeGrenade(grenade.x, grenade.y);
         });
-    
-        // ... (other grenade-related logic)
     }
 
-    // startGrenadeCooldown() {
-    //     this.grenadeCooldown = true;
-
-    //     // Set a timer for the cooldown duration (10 seconds)
-    //     this.time.delayedCall(10000, () => {
-    //         this.grenadeCooldown = false;
-    //     });
-    // }
     
     explodeGrenade(x, y) {
-        // Play a sound effect for the explosion (adjust as needed)
+        // Play a sound effect for the explosion
         this.sound.play('explosion', { volume: 0.15 });
 
-        // Create an animation for the grenade explosion
+        // Animation for the grenade explosion
         const explosionFrames = this.anims.generateFrameNames('grenade', {
             start: 1,
             end: 7,
@@ -386,17 +375,17 @@ class PlayScene extends Phaser.Scene {
         this.anims.create({
             key: 'grenadeExplosion',
             frames: explosionFrames,
-            frameRate: 10, // Adjust the frame rate as needed
-            repeat: 0, // Play the animation once
+            frameRate: 10,
+            repeat: 0,
         });
 
-        // Create a sprite for the grenade
+        // Sprite for the grenade
         const grenade = this.physics.add.sprite(x, y, 'grenade');
 
-        // Play the explosion animation
+        // Plays explosion animation
         grenade.play('grenadeExplosion');
 
-        // Set a timer to destroy the grenade sprite after the animation ends
+        // Sets timer to destroy grenade sprite after the animation ends
         this.time.delayedCall(700, () => {
             grenade.destroy();
         });
@@ -405,18 +394,18 @@ class PlayScene extends Phaser.Scene {
         this.enemies.getChildren().forEach(enemy => {
             const distance = Phaser.Math.Distance.Between(x, y, enemy.x, enemy.y);
     
-            // Adjust the blast radius as needed
+            // Blast radius
             const blastRadius = 150;
     
             if (distance < blastRadius) {
-                // Destroy the enemy
+                // Destroys the enemy/enemies
                 enemy.destroy();
     
-                // Increase the score
+                // Increase score
                 this.score += 1;
     
                 // Update the score display
-                this.scoreText.setText(`Score: ${this.score}`);
+                this.scoreText.setText(`Kill: ${this.score}`);
             }
         });
     }
@@ -431,13 +420,13 @@ class PlayScene extends Phaser.Scene {
                 this.countdownText.setText(`${seconds}s`);
             } else {
                 this.countdownText.setText('Ready');
-                this.grenadeCooldown = false; // Reset the cooldown flag when ready
+                this.grenadeCooldown = false; // Resets the cooldown flag when ready
             }
         }
     }
 
     startGrenadeCooldown() {
         this.grenadeCooldown = true;
-        this.lastGrenadeTime = this.time.now; // Update the last grenade time
+        this.lastGrenadeTime = this.time.now; // Updates the last grenade time
     }
 }
