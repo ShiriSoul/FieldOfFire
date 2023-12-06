@@ -1,75 +1,14 @@
-// class TutorialScene extends Phaser.Scene {
-//     constructor() {
-//         super('TutorialScene');
-//     }
-
-//     create() {
-//         const tutorialText = this.add.text(400, 300, '', { 
-//             fontSize: UI_SIZE.FONT_SIZE, 
-//             fill: '#fff', 
-//             align: 'center',
-//             wordWrap: { width: 700, useAdvancedWrap: true }
-//         });
-    
-//         tutorialText.setOrigin(0.5, 0.5); // Center the text
-    
-//         spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
-    
-//         const tutorialContent = [
-//             "Welcome to Field Of Fire!",
-//             "Field Of Fire is a game from Video Game High School",
-//             "It is a multiplayer first person shooter",
-//             "",
-//             "In this version, you are the last player alive,",
-//             "You will face endless enemy combatants.",
-//             "Your goal is to take as many out as you can.",
-//             "",
-//             "Press 'W', 'A', 'S', 'D' keys to move.",
-//             "Press Space key to shoot projectiles.",
-//             "Press 'G' key to use the explosive skill.",
-//             "",
-//             "Good Luck Soldier and remember...",
-//             "It's all about the game",
-//             "",
-//             "",
-//             "Press Space key to continue"
-//         ];
-    
-//         this.autoTypeText(tutorialText, tutorialContent);
-//     }
-
-//     async autoTypeText(tutorialText, tutorialContent) {
-//         for (const line of tutorialContent) {
-//             await this.typeLine(tutorialText, line);
-//             await this.delay(500); // Delay before starting the next line
-//         }
-
-//         // If all text is displayed, set up event to switch to PlayScene on space key press
-//         this.input.keyboard.on('keydown-SPACE', () => {
-//             this.input.keyboard.removeAllListeners('keydown-SPACE');
-//             this.scene.start('PlayScene');
-//         });
-//     }
-
-//     async typeLine(tutorialText, line) {
-//         tutorialText.text += '\n'; // Move to the next line
-//         for (let i = 0; i < line.length; i++) {
-//             tutorialText.text += line[i];
-//             await this.delay(50);
-//         }
-//     }
-
-//     delay(ms) {
-//         return new Promise(resolve => setTimeout(resolve, ms));
-//     }
-// }
-
 class TutorialScene extends Phaser.Scene {
     constructor() {
         super('TutorialScene');
     }
 
+    preload() {
+        this.load.image('tutorial', 'assets/tutorial.png');
+    }
+
     create() {    
+        const tutorial = this.add.image(400, 300, 'tutorial');
         const tutorialText = this.add.text(400, 300, '', { 
             fontSize: UI_SIZE.FONT_SIZE, 
             fill: '#fff', 
@@ -77,26 +16,26 @@ class TutorialScene extends Phaser.Scene {
             wordWrap: { width: 700, useAdvancedWrap: true }
         });
     
-        tutorialText.setOrigin(0.5, 0.5); // Center the text
+        tutorialText.setOrigin(0.5, 0.5); // Centers the text
     
         spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
     
         const tutorialContent = [
             "Welcome to Field Of Fire!",
-            "Field Of Fire is a game from Video Game High School",
-            "It is a multiplayer first-person shooter",
+            "You are the last player alive,",
+            "The enemy team is getting bold",
+            "They will try to melee you.",
+            "Overtake you through numbers",
+            "Your goal is to survive.",
             "",
-            "In this version, you are the last player alive,",
-            "The enemy team is getting bold and will try to melee you.",
-            "Your goal is to take as many out as you can.",
+            "Use 'W','A','S','D' keys to move.",
+            "Press 'G' key to place a grenade.",
+            "M key mutes all audio",
             "",
-            "Press 'W', 'A', 'S', 'D' keys to move.",
-            "Press 'G' key to use the explosive skill.",
-            "M will mute all audio: bgm, sfx, etc.",
+            "Press 'Space' to continue ",
             "",
-            "",
-            "Press Space key to continue"
         ];
+        
     
         this.autoTypeText(tutorialText, tutorialContent);
     }
@@ -104,7 +43,7 @@ class TutorialScene extends Phaser.Scene {
     async autoTypeText(tutorialText, tutorialContent) {
         let isTyping = true;
 
-        // Function to instantly finish typing and display all text
+        // Speed up typing and display all text
         const skipTyping = () => {
             isTyping = false;
             tutorialText.text = tutorialContent.join('\n');
@@ -112,10 +51,10 @@ class TutorialScene extends Phaser.Scene {
 
         this.input.keyboard.on('keydown-SPACE', () => {
             if (isTyping) {
-                // If currently typing, skip to the end
+                // If typing then skip to end
                 skipTyping();
             } else {
-                // If all text is displayed, set up event to switch to PlayScene on space key press
+                // If all text is displayed, set up event: SPACE to switch to PlayScene
                 this.input.keyboard.removeAllListeners('keydown-SPACE');
                 this.scene.start('PlayScene');
             }
@@ -127,7 +66,7 @@ class TutorialScene extends Phaser.Scene {
             }
         }
 
-        // If all text is displayed, set up event to switch to PlayScene on space key press
+        // If all text is displayed, set up event: SPACE to switch to PlayScene
         this.input.keyboard.removeAllListeners('keydown-SPACE');
         this.input.keyboard.on('keydown-SPACE', () => {
             this.input.keyboard.removeAllListeners('keydown-SPACE');
@@ -136,7 +75,7 @@ class TutorialScene extends Phaser.Scene {
     }
 
     async typeLine(tutorialText, line) {
-        tutorialText.text += '\n'; // Move to the next line
+        tutorialText.text += '\n'; // Moves to next line
         for (let i = 0; i < line.length; i++) {
             tutorialText.text += line[i];
             await this.delay(50);

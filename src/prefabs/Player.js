@@ -6,5 +6,6 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         this.setCollideWorldBounds(true);
     }
 
-    // Add any additional player-related logic here
+    // Not used. The player stuff like movement are all defined in PlayScene as it was easier for me
+
 }

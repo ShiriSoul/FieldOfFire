@@ -10,13 +10,13 @@ class TitleScene extends Phaser.Scene {
         this.load.audio('bgm', 'assets/MrSmithAction.wav');
         this.load.audio('shoot', 'assets/shoot.wav');
         this.load.audio('explosion', 'assets/explosion.wav');
-        // update instruction text
     }
 
     create() {
         const titleScreen = this.add.image(400, 300, 'titlescreen');
         titleScreen.setInteractive();
 
+        // Event: press SPACE to go to TutorialScene
         const startText = this.add.text(250, 500, 'Press Space Key to Start', { fontSize: UI_SIZE.TITLE_SIZE, fill: '#fff' });
 
         spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);

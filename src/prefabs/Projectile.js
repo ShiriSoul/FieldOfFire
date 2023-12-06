@@ -5,5 +5,6 @@ class Projectile extends Phaser.Physics.Arcade.Sprite {
         scene.physics.add.existing(this);
     }
 
-    // Add any additional projectile-related logic here
+    // Nothing here because all projectile was is a sprite that moves in a direction
+    // In PlayScene I set up the collision for it
 }
