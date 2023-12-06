@@ -9,13 +9,17 @@ class PlayScene extends Phaser.Scene {
     }
 
     preload() {
+        this.load.image('background', 'assets/background.png');
         this.load.image('player', 'assets/player.png');
         this.load.image('projectile', 'assets/projectile.png');
         this.load.image('enemy', 'assets/enemy.png');
-        this.load.image('grenade', 'assets/grenade.png');
+        this.load.atlas('grenade', '/assets/grenade1.png', 'assets/grenade1.json');
     }
 
     create() {
+        // Add the background image
+        const background = this.add.sprite(1600, 1200, 'background'); // Adjust the position as needed
+
         // Instantiate player, projectiles, enemies
         this.player = new Player(this, 1600, 1200);
         this.projectiles = this.physics.add.group({ classType: Projectile });
@@ -306,6 +310,16 @@ class PlayScene extends Phaser.Scene {
 
     showCollisionPopup() {
         this.sound.stopAll();
+
+        // Stop shooting
+        if (this.shootTimer) {
+            this.shootTimer.destroy();
+        }
+
+        // Destroy all existing enemies
+        this.enemies.getChildren().forEach(enemy => {
+            enemy.destroy();
+        });
     
         // Add a semi-transparent background rectangle
         const popupBackground = this.add.rectangle(this.cameras.main.width / 2, this.cameras.main.height / 2, 400, 200, 0x808080, 0.5)
@@ -330,6 +344,7 @@ class PlayScene extends Phaser.Scene {
             this.sound.play('select', { volume: 0.15 });
             
             // Restart the game
+            this.gameOver = false;
             this.scene.restart();
         });
     }
@@ -358,6 +373,33 @@ class PlayScene extends Phaser.Scene {
     explodeGrenade(x, y) {
         // Play a sound effect for the explosion (adjust as needed)
         this.sound.play('explosion', { volume: 0.15 });
+
+        // Create an animation for the grenade explosion
+        const explosionFrames = this.anims.generateFrameNames('grenade', {
+            start: 1,
+            end: 7,
+            zeroPad: 0,
+            prefix: 'g',
+            suffix: '.png',
+        });
+
+        this.anims.create({
+            key: 'grenadeExplosion',
+            frames: explosionFrames,
+            frameRate: 10, // Adjust the frame rate as needed
+            repeat: 0, // Play the animation once
+        });
+
+        // Create a sprite for the grenade
+        const grenade = this.physics.add.sprite(x, y, 'grenade');
+
+        // Play the explosion animation
+        grenade.play('grenadeExplosion');
+
+        // Set a timer to destroy the grenade sprite after the animation ends
+        this.time.delayedCall(700, () => {
+            grenade.destroy();
+        });
     
         // Iterate through all enemies and check if they are within the blast radius
         this.enemies.getChildren().forEach(enemy => {
