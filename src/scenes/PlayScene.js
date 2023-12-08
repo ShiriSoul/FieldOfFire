@@ -13,7 +13,7 @@ class PlayScene extends Phaser.Scene {
         this.load.image('player', 'assets/player.png');
         this.load.image('projectile', 'assets/projectile.png');
         this.load.image('enemy', 'assets/enemy.png');
-        this.load.atlas('grenade', 'FieldOfFire/assets/grenade1.png', 'FieldOfFire/assets/grenade1.json');
+        this.load.atlas('grenade', '/assets/grenade1.png', 'assets/grenade1.json');
     }
 
     create() {
