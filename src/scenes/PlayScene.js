@@ -13,7 +13,7 @@ class PlayScene extends Phaser.Scene {
         this.load.image('player', 'assets/player.png');
         this.load.image('projectile', 'assets/projectile.png');
         this.load.image('enemy', 'assets/enemy.png');
-        this.load.atlas('grenade', '/assets/grenade1.png', 'assets/grenade1.json');
+        this.load.atlas('grenade', 'assets/grenade1.png', 'assets/grenade1.json');
     }
 
     create() {
@@ -252,7 +252,7 @@ class PlayScene extends Phaser.Scene {
                 projectile.setVelocity(velocityX, velocityY);
                 projectile.setPosition(this.player.x + offsetX, this.player.y + offsetY);
 
-                projectile.setScale(.25);
+                projectile.setScale(2);
 
                 // Play the shooting sfx
                 this.sound.play('shoot', { volume: 0.15 });
