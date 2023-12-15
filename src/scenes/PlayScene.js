@@ -4,8 +4,10 @@ class PlayScene extends Phaser.Scene {
         this.shootTimer = null;
         this.lastPlayerDirection = 'UP';
         this.grenadeCooldown = false;
-        this.grenadeCooldownTime = 10000; // 10 seconds. Adjust as needed
+        this.grenadeCooldownTime = 10000; // 10 seconds in milliseconds. Adjust as needed
         this.lastGrenadeTime = 0;
+        this.gameTimer = 600000; // 10 minutes in milliseconds
+        this.lastTimerUpdate = 0;
     }
 
     preload() {
@@ -106,6 +108,20 @@ class PlayScene extends Phaser.Scene {
                 this.startGrenadeCooldown();
             }
         });
+
+        // Coutndown 10min
+
+        const timerTextStyle = { fontSize: '24px', fill: '#fff' };
+        this.timerText = this.add.text(
+            this.cameras.main.width / 2, // X-coordinate (center of the screen)
+            16,                           // Y-coordinate
+            '10:00',                      // Initial display
+            timerTextStyle
+        )
+        .setOrigin(0.5, 0)                // Sets origin to top center
+        .setScrollFactor(0)
+        .setBackgroundColor('#000')
+        .setAlpha(0.7);
     }
 
     update() {
@@ -201,6 +217,8 @@ class PlayScene extends Phaser.Scene {
 
         // Updates the countdown display
         this.updateCountdownDisplay();
+
+        this.updateGameTimer();
     }
     
 
@@ -293,6 +311,26 @@ class PlayScene extends Phaser.Scene {
         enemy.setVelocity(0, 100);
     }
 
+    updateGameTimer() {
+        const now = this.time.now;
+        const elapsedUpdateTime = now - this.lastTimerUpdate;
+    
+        if (elapsedUpdateTime > 1000) { // Update every 1000 milliseconds (1 second)
+            this.gameTimer -= elapsedUpdateTime;
+            this.lastTimerUpdate = now;
+    
+            if (this.gameTimer <= 0) {
+                this.showCollisionPopup2(); // Replace this with your existing popup function
+            } else {
+                const minutes = Math.floor(this.gameTimer / 60000);
+                const seconds = Math.floor((this.gameTimer % 60000) / 1000);
+    
+                const formattedTime = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                this.timerText.setText(formattedTime);
+            }
+        }
+    }    
+
     // Kill count
     projectileHitEnemy(projectile, enemy) {
         projectile.destroy();
@@ -330,6 +368,50 @@ class PlayScene extends Phaser.Scene {
         // Create a popup and display the score
         const popupTextStyle = { fontSize: '32px', fill: '#fff', padding: 10 };
         const popupText = this.add.text(this.cameras.main.width / 2, this.cameras.main.height / 2 - 40, `Game Over!\nKills: ${this.score}`, popupTextStyle)
+            .setOrigin(0.5)
+            .setScrollFactor(0);
+    
+        // Adds a restart the game button
+        const buttonStyle = { fontSize: '24px', fill: '#fff', backgroundColor: '#008CBA', padding: 10 };
+        const restartButton = this.add.text(this.cameras.main.width / 2, this.cameras.main.height / 2 + 60, 'Click Here To Restart', buttonStyle)
+            .setOrigin(0.5)
+            .setScrollFactor(0)
+            .setInteractive();
+    
+        restartButton.on('pointerdown', () => {
+            // Play the "select" sound effect
+            this.sound.play('select', { volume: 0.15 });
+            
+            // Restarts the game
+            this.gameOver = false;
+            this.scene.restart();
+        });
+    }
+
+    // Win Game Over Pop-up
+    showCollisionPopup2() {
+        this.sound.stopAll(); // Ends audio
+
+        this.sound.play('win', { volume: 0.15 });
+
+        // Stops auto shooting
+        if (this.shootTimer) {
+            this.shootTimer.destroy();
+        }
+
+        // Destroy all existing enemies (I think enemies still spawn and I couldn't work past it but the score won't be added to it and enemies get destroyed on contact)
+        this.enemies.getChildren().forEach(enemy => {
+            enemy.destroy();
+        });
+    
+        // Add a semi-transparent background rectangle
+        const popupBackground = this.add.rectangle(this.cameras.main.width / 2, this.cameras.main.height / 2, 400, 200, 0x808080, 0.5)
+            .setOrigin(0.5)
+            .setScrollFactor(0);
+    
+        // Create a popup and display the score
+        const popupTextStyle = { fontSize: '32px', fill: '#fff', padding: 10 };
+        const popupText = this.add.text(this.cameras.main.width / 2, this.cameras.main.height / 2 - 40, `You Survived!\nKills: ${this.score}`, popupTextStyle)
             .setOrigin(0.5)
             .setScrollFactor(0);
     

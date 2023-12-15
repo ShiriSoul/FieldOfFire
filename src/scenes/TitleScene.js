@@ -11,6 +11,7 @@ class TitleScene extends Phaser.Scene {
         this.load.audio('shoot', 'assets/shoot.wav');
         this.load.audio('explosion', 'assets/explosion.wav');
         this.load.audio('lose', 'assets/lose.mp3');
+        this.load.audio('win', 'assets/win.mp3');
     }
 
     create() {
@@ -28,6 +29,6 @@ class TitleScene extends Phaser.Scene {
             startText.setVisible(false);
             this.scene.start('TutorialScene');
         });
-        document.getElementById('info').innerHTML = 'W,A,S,D: move | G: grenade (20 second cooldown) | M: mute audio'
+        document.getElementById('info').innerHTML = 'W,A,S,D: move | G: grenade (10 second cooldown) | M: mute audio'
     }
 }
